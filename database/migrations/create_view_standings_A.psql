@@ -1,0 +1,79 @@
+-- View: public.standings_group_a
+
+-- DROP VIEW public.standings_group_a;
+
+CREATE OR REPLACE VIEW public.standings_group_a
+ AS
+ WITH played_matches AS (
+         SELECT m.home_team,
+            mr.home_score,
+            mr.away_score,
+            m.away_team
+           FROM match m
+             JOIN team t1 ON t1.id = m.home_team
+             JOIN match_result mr ON mr.match_id = m.id
+          WHERE t1."group" = 'A'::"char"
+        )
+ SELECT t.name AS team,
+    sum(totals.pts) AS pts,
+    sum(totals.p) AS p,
+    sum(totals.v) AS v,
+    sum(totals.e) AS e,
+    sum(totals.d) AS d,
+    sum(totals.gp) AS gp,
+    sum(totals.gc) AS gc,
+    sum(totals.sg) AS sg
+   FROM ( SELECT played_matches.home_team AS team,
+            1 AS p,
+                CASE
+                    WHEN played_matches.home_score > played_matches.away_score THEN 1
+                    ELSE 0
+                END AS v,
+                CASE
+                    WHEN played_matches.home_score = played_matches.away_score THEN 1
+                    ELSE 0
+                END AS e,
+                CASE
+                    WHEN played_matches.home_score < played_matches.away_score THEN 1
+                    ELSE 0
+                END AS d,
+            played_matches.home_score AS gp,
+            played_matches.away_score AS gc,
+            played_matches.home_score - played_matches.away_score AS sg,
+                CASE
+                    WHEN played_matches.home_score > played_matches.away_score THEN 3
+                    WHEN played_matches.home_score = played_matches.away_score THEN 1
+                    ELSE 0
+                END AS pts
+           FROM played_matches
+        UNION ALL
+         SELECT played_matches.away_team AS team,
+            1 AS p,
+                CASE
+                    WHEN played_matches.away_score > played_matches.home_score THEN 1
+                    ELSE 0
+                END AS v,
+                CASE
+                    WHEN played_matches.away_score = played_matches.home_score THEN 1
+                    ELSE 0
+                END AS e,
+                CASE
+                    WHEN played_matches.away_score < played_matches.home_score THEN 1
+                    ELSE 0
+                END AS d,
+            played_matches.away_score AS gp,
+            played_matches.home_score AS gc,
+            played_matches.away_score - played_matches.home_score AS sg,
+                CASE
+                    WHEN played_matches.away_score > played_matches.home_score THEN 3
+                    WHEN played_matches.away_score = played_matches.home_score THEN 1
+                    ELSE 0
+                END AS pts
+           FROM played_matches) totals
+     JOIN team t ON totals.team = t.id
+  GROUP BY t.name
+  ORDER BY (sum(totals.pts)) DESC, (sum(totals.sg)) DESC, (sum(totals.gp)) DESC;
+
+ALTER TABLE public.standings_group_a
+    OWNER TO postgres;
+

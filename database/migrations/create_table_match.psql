@@ -1,0 +1,23 @@
+-- Table: public.match
+
+-- DROP TABLE IF EXISTS public.match;
+
+CREATE TABLE IF NOT EXISTS public.match
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    home_team integer NOT NULL,
+    away_team integer NOT NULL,
+    stage integer NOT NULL,
+    date timestamp with time zone NOT NULL,
+    CONSTRAINT match_pkey PRIMARY KEY (id),
+    CONSTRAINT stage FOREIGN KEY (stage)
+        REFERENCES public.stage (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.match
+    OWNER to postgres;

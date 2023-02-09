@@ -1,0 +1,28 @@
+-- Table: public.prediction
+
+-- DROP TABLE IF EXISTS public.prediction;
+
+CREATE TABLE IF NOT EXISTS public.prediction
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    user_id integer NOT NULL,
+    match_id integer NOT NULL,
+    home_score integer NOT NULL,
+    away_score integer NOT NULL,
+    CONSTRAINT prediction_pkey PRIMARY KEY (id),
+    CONSTRAINT valid_match FOREIGN KEY (match_id)
+        REFERENCES public.match (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT valid_user FOREIGN KEY (user_id)
+        REFERENCES public."user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT "home_score >= 0" CHECK (home_score >= 0),
+    CONSTRAINT "away_score >= 0" CHECK (away_score >= 0)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.prediction
+    OWNER to postgres;

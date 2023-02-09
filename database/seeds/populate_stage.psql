@@ -1,0 +1,9 @@
+INSERT INTO public."stage"(id, name)
+	VALUES 
+	(1, 'GRUPOS'),
+	(2, 'OITAVAS'),
+	(3, 'QUARTAS'),
+	(4, 'SEMI'),
+	(5, 'FINAL'),
+	(6, 'TERCEIRO_QUARTO')
+	;

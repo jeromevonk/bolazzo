@@ -1,0 +1,23 @@
+-- Table: public.match_result
+
+-- DROP TABLE IF EXISTS public.match_result;
+
+CREATE TABLE IF NOT EXISTS public.match_result
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    match_id integer,
+    home_score integer NOT NULL,
+    away_score integer,
+    CONSTRAINT match_result_pkey PRIMARY KEY (id),
+    CONSTRAINT match FOREIGN KEY (match_id)
+        REFERENCES public.match (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT "home_score >= 0" CHECK (home_score >= 0),
+    CONSTRAINT "away_score >= 0" CHECK (away_score >= 0)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.match_result
+    OWNER to postgres;

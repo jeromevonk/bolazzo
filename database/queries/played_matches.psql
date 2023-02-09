@@ -1,0 +1,15 @@
+SELECT 
+	m.home_team,
+	t1.name as home_team_name,
+	mr.home_score, 
+	mr.away_score, 
+	t2.name as away_team_name,
+	m.away_team,
+	m.stage,
+	t1.group,
+	m.date
+FROM public.match m
+	JOIN public.team t1 on t1.id = m.home_team
+	JOIN public.team t2 on t2.id = m.away_team
+	JOIN public.match_result mr on mr.match_id = m.id
+;

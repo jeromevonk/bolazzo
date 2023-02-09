@@ -1,0 +1,15 @@
+-- Table: public.stage
+
+-- DROP TABLE IF EXISTS public.stage;
+
+CREATE TABLE IF NOT EXISTS public.stage
+(
+    id integer NOT NULL,
+    name character varying(15) COLLATE pg_catalog."default",
+    CONSTRAINT stage_pkey PRIMARY KEY (id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.stage
+    OWNER to postgres;

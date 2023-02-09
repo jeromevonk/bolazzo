@@ -1,0 +1,62 @@
+-- see https://jonlabelle.com/snippets/view/sql/league-table-in-mysql
+
+-- Steps 
+-- a) Join the matches and the results into 'games' (https://www.postgresql.org/docs/9.1/queries-with.html)
+-- b) Subquerie 'totals':
+--    Make a union of two selects on the 'games' common table
+--    Calculate points, victories, draw, defeat for earch game
+--    First select takes in account the home_team of
+--    Second select takes in account the away_team of
+-- c) Join totals grouping by team
+
+WITH played_matches as (
+	SELECT
+		m.home_team, 
+		mr.home_score, 
+		mr.away_score, 
+		m.away_team
+	FROM public.match m
+	  JOIN public.team t1 on t1.id = m.home_team
+	  JOIN public.match_result mr on mr.match_id = m.id
+	WHERE t1.group = 'B'
+)
+
+SELECT
+    t.name as team,
+    SUM(pts) as pts,
+    SUM(p) as p, 
+    SUM(v) as v,
+    SUM(e) as e,
+    SUM(d) as d,
+    SUM(gp) as gp,
+    SUM(gc) as gc,
+    SUM(sg) as sg
+FROM 
+  (
+    SELECT
+        home_team as team,
+        1 as p,
+        CASE WHEN home_score > away_score THEN 1 ELSE 0 END as v,
+        CASE WHEN home_score = away_score THEN 1 ELSE 0 END as e,
+        CASE WHEN home_score < away_score THEN 1 ELSE 0 END as d,
+        home_score as gp,
+        away_score as gc,
+        home_score - away_score as sg,
+        CASE WHEN home_score > away_score THEN 3 WHEN home_score = away_score THEN 1 ELSE 0 END as pts
+    FROM played_matches
+    UNION ALL
+    SELECT
+        away_team as team,
+        1 p,
+        CASE WHEN away_score > home_score THEN 1 ELSE 0 END as v,
+        CASE WHEN away_score = home_score THEN 1 ELSE 0 END as e,
+        CASE WHEN  away_score < home_score THEN 1 ELSE 0 END as d,
+        away_score as gp,
+        home_score as gc,
+        away_score - home_score as sg,
+        CASE WHEN away_score > home_score THEN 3 WHEN away_score = home_score THEN 1 ELSE 0 END as pts
+    FROM played_matches
+  ) as totals
+JOIN team t ON totals.team=t.id
+GROUP BY t.name
+ORDER BY SUM(pts) DESC, SUM(sg) DESC, SUM(GP) DESC;

@@ -1,0 +1,11 @@
+INSERT INTO public.team(name, "group")
+	VALUES 
+	('Catar', 'A'),
+	('Holanda', 'A'),
+	('Equador', 'A'),
+	('Senegal', 'A'),
+	
+	('Inglaterra', 'B'),
+	('EUA', 'B'),
+	('Irã', 'B'),
+	('Gales', 'B');
