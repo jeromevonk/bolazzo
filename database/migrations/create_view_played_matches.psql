@@ -4,7 +4,9 @@
 
 CREATE OR REPLACE VIEW public.played_matches
  AS
- SELECT m.home_team,
+ SELECT 
+    m.id AS match_id,
+    m.home_team,
     t1.name AS home_team_name,
     mr.home_score,
     mr.away_score,

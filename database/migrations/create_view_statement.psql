@@ -1,0 +1,43 @@
+-- View: public.statement
+
+-- DROP VIEW public.statement;
+
+CREATE OR REPLACE VIEW public.statement
+ AS
+ WITH match_prediction AS (
+         SELECT pl.match_id,
+            pred.user_id,
+            pl.home_team_name,
+            pl.away_team_name,
+            pl.home_score,
+            pl.away_score,
+            pred.home_score AS home_score_predicted,
+            pred.away_score AS away_score_predicted
+           FROM played_matches pl
+             JOIN prediction pred ON pl.match_id = pred.match_id
+        )
+ SELECT match_prediction.match_id,
+    match_prediction.user_id,
+    match_prediction.home_team_name,
+    match_prediction.away_team_name,
+    match_prediction.home_score,
+    match_prediction.away_score,
+    match_prediction.home_score_predicted,
+    match_prediction.away_score_predicted,
+        CASE
+            WHEN match_prediction.home_score = match_prediction.home_score_predicted AND match_prediction.away_score = match_prediction.away_score_predicted THEN 10
+            WHEN ((match_prediction.home_score - match_prediction.away_score) * (match_prediction.home_score_predicted - match_prediction.away_score_predicted)) > 0 THEN
+            CASE
+                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.home_score = match_prediction.home_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.away_score = match_prediction.away_score_predicted THEN 8
+                WHEN (match_prediction.home_score - match_prediction.away_score) = (match_prediction.home_score_predicted - match_prediction.away_score_predicted) THEN 7
+                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.away_score = match_prediction.away_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.home_score = match_prediction.home_score_predicted THEN 6
+                ELSE 5
+            END
+            WHEN match_prediction.home_score = match_prediction.away_score AND match_prediction.home_score_predicted = match_prediction.away_score_predicted THEN 4
+            ELSE 0
+        END AS points
+   FROM match_prediction;
+
+ALTER TABLE public.statement
+    OWNER TO postgres;
+

@@ -1,2 +1,6 @@
 INSERT INTO public."user"(name)
-	VALUES ('Lelo');
+	VALUES 
+	('Lelo'),
+	('Rato')
+	
+	;

@@ -1,0 +1,18 @@
+select 
+	RANK () OVER ( 
+		ORDER BY total_points desc
+	) rank,
+	user_name,
+	total_points
+FROM 
+	(
+		SELECT  
+			u.name as user_name,
+			SUM(points) as total_points
+		FROM public.statement st
+		JOIN public.user u ON st.user_id = u.id
+		GROUP BY u.name
+	) as x
+
+ORDER BY rank asc
+;
