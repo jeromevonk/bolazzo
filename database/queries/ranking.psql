@@ -1,7 +1,5 @@
 select 
-	RANK () OVER ( 
-		ORDER BY total_points desc
-	) rank,
+	RANK () OVER ( ORDER BY total_points desc) as rank,
 	user_name,
 	total_points
 FROM 
@@ -12,7 +10,7 @@ FROM
 		FROM public.statement st
 		JOIN public.user u ON st.user_id = u.id
 		GROUP BY u.name
-	) as x
+	) as ranking
 
 ORDER BY rank asc
 ;

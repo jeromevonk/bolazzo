@@ -13,9 +13,11 @@ CREATE OR REPLACE VIEW public.played_matches
     t2.name AS away_team_name,
     m.away_team,
     m.stage,
+    st.multiplier,
     t1."group",
     m.date
    FROM match m
+   JOIN public.stage st ON m.stage = st.id
      JOIN team t1 ON t1.id = m.home_team
      JOIN team t2 ON t2.id = m.away_team
      JOIN match_result mr ON mr.match_id = m.id;

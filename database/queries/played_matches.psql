@@ -6,10 +6,12 @@ SELECT
 	t2.name as away_team_name,
 	m.away_team,
 	m.stage,
+	st.multiplier,
 	t1.group,
 	m.date
 FROM public.match m
-	JOIN public.team t1 on t1.id = m.home_team
-	JOIN public.team t2 on t2.id = m.away_team
-	JOIN public.match_result mr on mr.match_id = m.id
+	JOIN public.stage st ON m.stage = st.id
+	JOIN public.team t1 ON t1.id = m.home_team
+	JOIN public.team t2 ON t2.id = m.away_team
+	JOIN public.match_result mr ON mr.match_id = m.id
 ;

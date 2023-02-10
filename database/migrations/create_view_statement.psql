@@ -12,7 +12,8 @@ CREATE OR REPLACE VIEW public.statement
             pl.home_score,
             pl.away_score,
             pred.home_score AS home_score_predicted,
-            pred.away_score AS away_score_predicted
+            pred.away_score AS away_score_predicted,
+            pl.multiplier
            FROM played_matches pl
              JOIN prediction pred ON pl.match_id = pred.match_id
         )
@@ -25,15 +26,15 @@ CREATE OR REPLACE VIEW public.statement
     match_prediction.home_score_predicted,
     match_prediction.away_score_predicted,
         CASE
-            WHEN match_prediction.home_score = match_prediction.home_score_predicted AND match_prediction.away_score = match_prediction.away_score_predicted THEN 10
+            WHEN match_prediction.home_score = match_prediction.home_score_predicted AND match_prediction.away_score = match_prediction.away_score_predicted THEN 10 * multiplier
             WHEN ((match_prediction.home_score - match_prediction.away_score) * (match_prediction.home_score_predicted - match_prediction.away_score_predicted)) > 0 THEN
             CASE
-                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.home_score = match_prediction.home_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.away_score = match_prediction.away_score_predicted THEN 8
-                WHEN (match_prediction.home_score - match_prediction.away_score) = (match_prediction.home_score_predicted - match_prediction.away_score_predicted) THEN 7
-                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.away_score = match_prediction.away_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.home_score = match_prediction.home_score_predicted THEN 6
-                ELSE 5
+                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.home_score = match_prediction.home_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.away_score = match_prediction.away_score_predicted THEN 8 * multiplier
+                WHEN (match_prediction.home_score - match_prediction.away_score) = (match_prediction.home_score_predicted - match_prediction.away_score_predicted) THEN 7 * multiplier
+                WHEN match_prediction.home_score > match_prediction.away_score AND match_prediction.away_score = match_prediction.away_score_predicted OR match_prediction.away_score > match_prediction.home_score AND match_prediction.home_score = match_prediction.home_score_predicted THEN 6 * multiplier
+                ELSE 5 * multiplier
             END
-            WHEN match_prediction.home_score = match_prediction.away_score AND match_prediction.home_score_predicted = match_prediction.away_score_predicted THEN 4
+            WHEN match_prediction.home_score = match_prediction.away_score AND match_prediction.home_score_predicted = match_prediction.away_score_predicted THEN 4 * multiplier
             ELSE 0
         END AS points
    FROM match_prediction;

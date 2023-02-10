@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.stage
 (
     id integer NOT NULL,
     name character varying(15) COLLATE pg_catalog."default",
+    multiplier integer NOT NULL,
     CONSTRAINT stage_pkey PRIMARY KEY (id)
 )
 

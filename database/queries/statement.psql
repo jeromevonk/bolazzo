@@ -7,7 +7,8 @@ WITH match_prediction as (
 		pl.home_score,
 		pl.away_score,
 		pred.home_score as home_score_predicted,
-		pred.away_score as away_score_predicted
+		pred.away_score as away_score_predicted,
+		pl.multiplier
 	FROM played_matches pl
 	JOIN prediction pred
 	  ON pl.match_id = pred.match_id
@@ -25,7 +26,7 @@ SELECT
 	CASE 
 -- 	    Palpite perfeito (https://www.resultadosdefutebol.com/como-funciona)
 		WHEN home_score = home_score_predicted AND away_score = away_score_predicted 
-		THEN 10 
+		THEN 10 * multiplier
 		
 -- 	    Acertou o vencedor?
 		WHEN (home_score - away_score) * (home_score_predicted - away_score_predicted) > 0 
@@ -34,24 +35,24 @@ SELECT
 -- 			    Acertou numero de gols do vencedor
 				WHEN (home_score > away_score AND home_score = home_score_predicted) OR
 				     (away_score > home_score AND away_score = away_score_predicted)
-				THEN 8
+				THEN 8 * multiplier
 				
 				-- Acertou a diferença de gols
 				WHEN home_score - away_score = home_score_predicted - away_score_predicted
-				THEN 7
+				THEN 7 * multiplier
 				
 				-- Acertou numero  de gols do perdedor
 				WHEN (home_score > away_score AND away_score = away_score_predicted) OR
 				     (away_score > home_score AND home_score = home_score_predicted)
-				THEN 6
+				THEN 6 * multiplier
 				
 				-- Acertou apenas o vencedor
-				ELSE 5
+				ELSE 5 * multiplier
 			END
 		
 -- 	    Acertou empate?
 		WHEN home_score = away_score AND home_score_predicted = away_score_predicted
-		THEN 4 
+		THEN 4  * multiplier
 		
 -- 	    Errou
 		ELSE 0 
