@@ -1,18 +1,21 @@
 import { Controller, Get, Post, Put, Delete, Req, UseGuards } from '@nestjs/common';
 import { Request } from "express";
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { InjectKnex, Knex } from 'nestjs-knex';
 
 @Controller('match')
 export class MatchController {
+  constructor(
+    @InjectKnex() private readonly knex: Knex,
+  ) { }
+  
   @Post()
   create(@Req() request: Request): object {
     return { req: request.body };
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  read(): object {
-    return { homeTeam: "Qatar", awayTeam: "Equador" };
+  async read() {
+    return this.knex.select('*').from('match');
   }
 
   @Put()

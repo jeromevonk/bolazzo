@@ -1,11 +1,16 @@
 import { Controller, Get, Post, Put, Delete, Req } from '@nestjs/common';
 import { Request } from "express";
+import { InjectKnex, Knex } from 'nestjs-knex';
 
 @Controller('team')
 export class TeamController {
+  constructor(
+    @InjectKnex() private readonly knex: Knex,
+  ) { }
+
   @Get()
-  findAllTeams(): object {
-    return { name: "Qatar" };
+  async read() {
+    return this.knex.select('*').from('team');
   }
 
   @Post()
