@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Req, UseGuards } from '@nestjs/common';
 import { Request } from "express";
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('match')
 export class MatchController {
@@ -8,6 +9,7 @@ export class MatchController {
     return { req: request.body };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   read(): object {
     return { homeTeam: "Qatar", awayTeam: "Equador" };
